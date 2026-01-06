@@ -9,6 +9,10 @@ RUN echo 'Package: *' >> /etc/apt/preferences.d/mozilla-firefox
 RUN echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox
 RUN echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox
 RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:jammy";' | tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
-EXPOSE 7575
+RUN apt update -y && apt install -y firefox
+RUN apt update -y && apt install -y xubuntu-icon-theme
+RUN touch /root/.Xauthority
+EXPOSE 5901
 EXPOSE 6080
-CMD bash -c "wget -O install.sh https://raw.githubusercontent.com/dalilahso/belajar/refs/heads/main/install.sh && chmod +x install.sh && ./install.sh"
+EXPOSE 7575
+CMD bash -c "vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE && openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem && websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901 && tail -f /dev/null"
